@@ -6,9 +6,8 @@ Parameters:
     * disk.warning: Warning threshold in % of disk space (defaults to 80%)
     * disk.critical: Critical threshold in % of disk space (defaults to 90%)
     * disk.path: Comma separated list of paths (defaults to /)
-    * disk.showpath: Enable or disable absolute path display (defaults to true)
-    * disk.open: Which application / file manager to launch (default xdg-open)
-    * disk.format: Format string, tags {path}, {used}, {left}, {size} and {percent} (defaults to '{path} {used}/{size} ({percent:05.02f}%)')
+    * disk.open: Which application / file manager to use for opening the selected directory (defaults to xdg-open) 
+    * disk.format: Format string, tags {path}, {used}, {left}, {size} and {percent} (defaults to '({path}) {used}/{size} ({percent:05.02f}%)')
     * disk.system: Unit system to use - SI (KB, MB, ...) or IEC (KiB, MiB, ...) (defaults to 'IEC')
 """
 
@@ -22,6 +21,7 @@ import util.format
 
 
 class Module(core.module.Module):
+
     def __init__(self, config, theme):
         super().__init__(config, theme, core.widget.Widget(self.diskspace))
 
@@ -30,11 +30,8 @@ class Module(core.module.Module):
                 filter( len, util.format.aslist(self.parameter("path", "/")) )
         )
 
-        self._showPath = util.format.asbool(self.parameter('showpath', True))
-        if self._showPath:
-            self._format = self.parameter("format", "({path}) {used}/{size} ({percent:05.02f}%)")
-        else:
-            self._format = self.parameter("format", "{used}/{size} ({percent:05.02f}%)")
+        self._format = self.parameter("format", "({path}) {used}/{size} ({percent:05.02f}%)")
+        p = self.parameter('format', '{path}')
 
         self._system = self.parameter("system", "IEC")
 
@@ -46,7 +43,7 @@ class Module(core.module.Module):
         core.input.register(
             self,
             button=core.input.LEFT_MOUSE,
-            cmd="{} {}".format(self.parameter("open", "xdg-open"), self._path[self._indexPath]),
+            cmd="openDir",
         )
 
         core.input.register(
@@ -84,6 +81,12 @@ class Module(core.module.Module):
 
     def state(self, widget):
         return self.threshold_state(self._percent, 80, 90)
+
+    def openDir(self, event):
+        util.cli.execute(
+                "{} {}".format( self.parameter("open", "xdg-open"),
+                                self._path[self._indexPath] )
+        )
 
     def nextPath(self, event):
         self._indexPath += 1
