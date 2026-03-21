@@ -527,6 +527,15 @@
       "prefix": ""
     }
   },
+  "sensors-aquacomputer": {
+    "pump-rpm":        { "prefix": "" },
+    "water-in":        { "prefix": "" },
+    "water-out":       { "prefix": "" },
+    "loop-pressure":   { "prefix": "" },
+    "flow-rate":       { "prefix": "" },
+    "coolant-quality": { "prefix": "" },
+    "conductivity":    { "prefix": "" }
+  },    
   "traffic": {
     "rx": {
       "prefix": ""
